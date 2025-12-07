@@ -1,18 +1,41 @@
 package com.example.examen.views
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.examen.models.Artwork
+import com.example.examen.viewmodels.DetailViewModel
 
 @Composable
 fun DetailScreen(artwork: Artwork) {
-    Scaffold {
- paddingValues ->
+    val viewModel: DetailViewModel = viewModel()
+
+    // Usamos LaunchedEffect para pasar la obra de arte al ViewModel una sola vez
+    LaunchedEffect(artwork) {
+        viewModel.setArtwork(artwork)
+    }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { viewModel.toggleFavorite() },
+            ) {
+                Icon(
+                    imageVector = if (viewModel.isFavorite.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite Icon"
+                )
+            }
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
