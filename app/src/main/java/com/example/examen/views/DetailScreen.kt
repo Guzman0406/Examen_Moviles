@@ -2,6 +2,8 @@ package com.example.examen.views
 
 import android.app.Application
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -42,7 +44,8 @@ fun DetailScreen(artwork: Artwork) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Usar el padding del Scaffold
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
             AsyncImage(
@@ -57,7 +60,7 @@ fun DetailScreen(artwork: Artwork) {
             Text(text = artwork.title, style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = artwork.artistDisplay ?: "Artista Desconocido", style = MaterialTheme.typography.titleSmall)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(text = artwork.thumbnail?.altText ?: "Sin descripción.")
         }
     }

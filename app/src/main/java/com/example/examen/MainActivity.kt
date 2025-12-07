@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -126,11 +130,17 @@ fun MainScreen() {
         NavHost(
             navController = navController,
             startDestination = AppScreen.SearchScreen.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = { fadeIn(animationSpec = tween(300)) },
+            exitTransition = { fadeOut(animationSpec = tween(300)) }
         ) {
             composable(AppScreen.SearchScreen.route) { SearchScreen(navController, sharedViewModel) }
             composable(AppScreen.FavoritesScreen.route) { FavoritesScreen(navController, sharedViewModel) }
-            composable(AppScreen.DetailScreen.route) {
+            composable(
+                route = AppScreen.DetailScreen.route,
+                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) },
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) }
+            ) {
                 val selectedArtwork by sharedViewModel.selectedArtwork.collectAsState()
                 selectedArtwork?.let { DetailScreen(it) }
             }
