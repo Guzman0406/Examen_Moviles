@@ -28,6 +28,7 @@ fun DetailScreen(artwork: Artwork) {
     val viewModel: DetailViewModel = viewModel(factory = DetailViewModelFactory(application, artwork))
 
     val isFavorite by viewModel.isFavorite.collectAsState()
+    val translatedDescription by viewModel.translatedDescription.collectAsState()
 
     Scaffold(
         floatingActionButton = {
@@ -61,7 +62,7 @@ fun DetailScreen(artwork: Artwork) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = artwork.artistDisplay ?: "Artista Desconocido", style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = artwork.thumbnail?.altText ?: "Sin descripción.")
+            Text(text = translatedDescription)
         }
     }
 }
