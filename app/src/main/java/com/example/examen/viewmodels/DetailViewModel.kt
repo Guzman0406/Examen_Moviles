@@ -1,35 +1,55 @@
 package com.example.examen.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.examen.ArtworkApplication
 import com.example.examen.models.Artwork
-import com.example.examen.repositories.FavoritesRepository
+import com.example.examen.repositories.ArtworkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel(application: Application, private val artwork: Artwork) : AndroidViewModel(application) {
 
-    private val _artwork = MutableStateFlow<Artwork?>(null)
-    val artwork: StateFlow<Artwork?> = _artwork.asStateFlow()
+    private val repository: ArtworkRepository = (application as ArtworkApplication).artworkRepository
 
-    // Usamos un State de Compose para el corazón, para que la UI se actualice al instante
-    var isFavorite = mutableStateOf(false)
-        private set
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
 
-    fun setArtwork(artwork: Artwork) {
-        _artwork.value = artwork
-        isFavorite.value = FavoritesRepository.isFavorite(artwork.id)
+    init {
+        checkIfFavorite()
+    }
+
+    private fun checkIfFavorite() {
+        viewModelScope.launch {
+            repository.isFavorite(artwork.id).collectLatest {
+                _isFavorite.value = it
+            }
+        }
     }
 
     fun toggleFavorite() {
-        _artwork.value?.let { artwork ->
-            if (isFavorite.value) {
-                FavoritesRepository.removeFavorite(artwork.id)
+        viewModelScope.launch {
+            if (_isFavorite.value) {
+                repository.removeFavorite(artwork.id)
             } else {
-                FavoritesRepository.addFavorite(artwork)
+                repository.addFavorite(artwork)
             }
-            isFavorite.value = !isFavorite.value
         }
+    }
+}
+
+class DetailViewModelFactory(private val application: Application, private val artwork: Artwork) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return DetailViewModel(application, artwork) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

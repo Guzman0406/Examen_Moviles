@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoadingScreen(onLoadingFinished: () -> Unit) {
     LaunchedEffect(key1 = true) {
-        delay(2000) // Espera de 2 segundos
+        delay(2000)
         onLoadingFinished()
     }
 

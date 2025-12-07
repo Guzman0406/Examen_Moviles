@@ -1,9 +1,11 @@
 package com.example.examen.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.examen.data.RetrofitClient
+import com.example.examen.ArtworkApplication
 import com.example.examen.models.Artwork
+import com.example.examen.repositories.ArtworkRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
-class SearchViewModel : ViewModel() {
+class SearchViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository: ArtworkRepository = (application as ArtworkApplication).artworkRepository
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -44,11 +48,7 @@ class SearchViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = RetrofitClient.instance.searchArtworks(query)
-                val iiifUrl = response.config.iiifUrl
-                _artworks.value = response.data.map { artwork ->
-                    artwork.copy(imageId = "${iiifUrl}/${artwork.imageId}/full/843,/0/default.jpg")
-                }
+                _artworks.value = repository.searchArtworks(query)
             } catch (e: Exception) {
                 _artworks.value = emptyList()
             }

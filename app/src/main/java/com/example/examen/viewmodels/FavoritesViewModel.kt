@@ -1,15 +1,35 @@
 package com.example.examen.viewmodels
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import com.example.examen.models.Artwork
-import com.example.examen.repositories.FavoritesRepository
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.examen.ArtworkApplication
+import com.example.examen.models.ArtworkEntity
+import com.example.examen.repositories.ArtworkRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
-class FavoritesViewModel : ViewModel() {
+class FavoritesViewModel(application: Application) : AndroidViewModel(application) {
 
-    val favoriteArtworks: StateFlow<List<Artwork>> = FavoritesRepository.favoriteArtworks
+    private val repository: ArtworkRepository = (application as ArtworkApplication).artworkRepository
+
+    val favoriteArtworks: Flow<List<ArtworkEntity>> = repository.favoriteArtworks
 
     fun removeFavorite(artworkId: Int) {
-        FavoritesRepository.removeFavorite(artworkId)
+        viewModelScope.launch {
+            repository.removeFavorite(artworkId)
+        }
+    }
+
+    class FavoritesViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return FavoritesViewModel(application) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

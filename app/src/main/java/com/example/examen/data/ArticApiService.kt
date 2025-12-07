@@ -8,14 +8,12 @@ import retrofit2.http.Query
 
 interface ArticApiService {
 
-    // Busca obras de arte y pide solo los campos que necesitamos para optimizar la respuesta
     @GET("artworks/search")
     suspend fun searchArtworks(
         @Query("q") query: String,
         @Query("fields") fields: String = "id,title,image_id,artist_display,thumbnail"
     ): ArtworksResponse
 
-    // Obtiene los detalles de una sola obra de arte
     @GET("artworks/{id}")
     suspend fun getArtworkDetails(
         @Path("id") artworkId: Int
