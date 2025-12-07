@@ -1,9 +1,16 @@
 package com.example.examen.views
 
 import android.app.Application
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -26,6 +33,7 @@ import com.example.examen.navigation.AppScreen
 import com.example.examen.viewmodels.FavoritesViewModel
 import com.example.examen.viewmodels.SharedViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoritesScreen(navController: NavController, sharedViewModel: SharedViewModel) {
     val application = LocalContext.current.applicationContext as Application
@@ -42,13 +50,15 @@ fun FavoritesScreen(navController: NavController, sharedViewModel: SharedViewMod
             Text(text = "No tienes obras de arte favoritas.")
         }
     } else {
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(favoriteArtworks, key = { it.id }) { artworkEntity ->
-                Box {
+                Box(modifier = Modifier.animateItemPlacement(tween(durationMillis = 300))) {
                     val artwork = Artwork(
                         id = artworkEntity.id,
                         title = artworkEntity.title,
