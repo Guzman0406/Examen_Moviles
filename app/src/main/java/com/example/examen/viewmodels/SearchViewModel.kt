@@ -48,7 +48,12 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _artworks.value = repository.searchArtworks(query)
+                val results = repository.searchArtworks(query)
+                val infiniteList = mutableListOf<Artwork>()
+                repeat(20) {
+                    infiniteList.addAll(results)
+                }
+                _artworks.value = infiniteList
             } catch (e: Exception) {
                 _artworks.value = emptyList()
             }
